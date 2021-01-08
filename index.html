@@ -1,0 +1,71 @@
+<canvas id="canvas" width="400" height="400"></canvas>
+
+<script src="boundary.js"></script>
+<script src="vector.js"></script>
+<script src="ray.js"></script>
+<script src="particle.js"></script>
+
+<script>
+
+    let walls = [];
+    let particle;
+
+    window.onload = function()
+    {
+        canvas = document.getElementById("canvas");
+        ctx = canvas.getContext("2d");
+
+        //boundaries.push(new Boundary(300,100,300,300));
+        walls.push(new Boundary(0,0,canvas.width,0));
+        walls.push(new Boundary(0,0,0,canvas.height));
+        walls.push(new Boundary(0,canvas.height,canvas.width,canvas.height));
+        walls.push(new Boundary(canvas.width,0,canvas.width,canvas.height));
+
+        for (var i = 0; i < 5; i++)
+        {
+            var x1 = Math.random() * canvas.width;
+            var y1 = Math.random() * canvas.height;
+            var x2 = Math.random() * canvas.width;
+            var y2 = Math.random() * canvas.height;
+            walls.push(new Boundary(x1,y1,x2,y2))
+        }
+        particle = new Particle(canvas.width,canvas.height);
+
+        document.addEventListener("mousemove",mouseMove);
+
+        var loop = setInterval(gameLoop, 1000/60);
+    }
+
+    mouseMove = function(event)
+    {
+        particle.update(event.clientX,event.clientY)
+    }
+
+    gameLoop = function()
+    {
+        draw();
+
+        /*for (var i = 0; i < boundaries.length; i++)
+        {
+            boundaries[i].draw(ctx);
+        }*/
+
+        for (var i = 0; i < walls.length; i++)
+        {
+
+        walls[i].draw(ctx);
+        }
+        
+        particle.look(walls,ctx);
+
+        particle.draw(ctx);
+    }
+
+    draw = function()
+    {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        
+    }
+</script>
