@@ -13,6 +13,11 @@ class Ray
         this.dir = Vector.Normalise(this.dir);
     }
 
+    setAngle(angle)
+    {
+        this.dir = Vector.fromAngle(angle);
+    }
+
     cast(wall)
     {
         const x1 = wall.a.x;

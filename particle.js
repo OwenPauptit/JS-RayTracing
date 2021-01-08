@@ -1,12 +1,48 @@
+
+let DegreeSeparation = 1;
 class Particle
 {
     constructor(width,height)
     {
+        this.fov = 60;
         this.pos = new Vector(width/2,height/2);
         this.rays = [];
-        for (var i = 0; i < 360; i+= 1)
+        this.heading = 0;
+        for (var i = -this.fov/2; i < this.fov/2 /*360*/; i+= DegreeSeparation)
         {
             this.rays.push(new Ray(this.pos, i * Math.PI / 180));
+        }
+    }
+
+    updateFOV(fov)
+    {
+        this.fov = fov;
+        this.rays = [];
+        for (var i = -this.fov/2; i < this.fov/2 /*360*/; i+= DegreeSeparation)
+        {
+            this.rays.push(new Ray(this.pos, (i+this.heading) * Math.PI / 180));
+        }
+    }
+
+    move(x)
+    {
+        let v = Vector.fromAngle(this.heading * Math.PI / 180);
+        v = Vector.Scale(v,x);
+        this.pos = Vector.Add(this.pos,v);
+        for (var i = 0; i < this.rays.length; i++)
+        {
+            this.rays[i].pos = this.pos;
+        }
+    }
+
+    rotate(angle)
+    {
+        this.heading += angle;
+        var index = 0;
+        for (var i = -this.rays.length/2; i < this.rays.length/2; i+= DegreeSeparation)
+        {
+            this.rays[index].setAngle((i+this.heading)* Math.PI / 180);
+            index++;
         }
     }
 
@@ -16,8 +52,11 @@ class Particle
         this.pos.y = y;
     }
 
+   
+
     look(walls,ctx)
     {
+        let tempscene = [];
         for (var i = 0; i < this.rays.length; i++)
         {
             let record = Infinity;
@@ -28,7 +67,9 @@ class Particle
                 const pt = this.rays[i].cast(wall);
                 if (pt)
                 {
-                    const d = Vector.DistanceSquared(this.pos,pt);
+                    let d = Vector.Distance(this.pos,pt);
+                    const a = Vector.GetAngle(this.rays[i].dir) - this.heading * Math.PI / 180;
+                    d *= Math.cos(a);
                     if (d < record)
                     {
                         record = d;
@@ -39,7 +80,7 @@ class Particle
             
             if (closest)
             {
-                ctx.strokeStyle = "#ffffff88";
+                ctx.strokeStyle = "#ffffff33";
                 ctx.lineWidth = 4;
                 ctx.beginPath();
                 ctx.moveTo(this.pos.x,this.pos.y);
@@ -47,7 +88,9 @@ class Particle
                 ctx.stroke();
                 ctx.lineWidth = 2
             }
+            tempscene[i] = record;
         }
+        return tempscene;
     }
 
     draw(ctx)
