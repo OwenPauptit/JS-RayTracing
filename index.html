@@ -139,7 +139,12 @@
         const w = (canvas.width / 2) / scene.length;
         for (var i = 0; i < scene.length; i++)
         {
-            ctx.fillStyle = "#ffffff" + ToHex(Math.floor(255-scene[i]));
+            let b = Math.floor(255-scene[i]);
+            if (b < 0)
+            {
+                b = 0;
+            }
+            ctx.fillStyle = "#ffffff" + ToHex(b);
           
             ctx.fillRect(i*w+canvas.width/2,scene[i]/5,w,canvas.height-2*scene[i]/5);
         }
